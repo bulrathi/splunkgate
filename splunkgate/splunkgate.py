@@ -8,7 +8,7 @@ sys.setdefaultencoding('utf-8')
 import uuid
 import shutil
 
-sys.path.append("lib") 
+sys.path.append("sglib") 
 from sgconfig import SplunkConfig
 from sglogger import SplunkLogger
 from sgdb import DBLayer
