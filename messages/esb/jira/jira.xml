@@ -1,0 +1,36 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://ish.curs.kz/SyncChannel/v10/Types">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<typ:SendMessage>
+			<request>
+				<requestInfo>
+					<messageId>123</messageId>
+					<correlationId></correlationId> <!-- Проставляет шина -->
+					<serviceId>JIRA</serviceId>					
+					<messageDate>2014-05-22T13:58:44.571Z</messageDate>
+					<routeId>ROUTE05</routeId>
+					<sender>
+						<senderId>OCS</senderId>
+						<password></password>
+					</sender>					
+					<properties>
+						<key>?</key>
+						<value>?</value>				
+					</properties>
+						
+				</requestInfo>
+				<requestData>
+					<!--Optional:-->
+					<data>
+						<Systems>
+							   	  <Systemcode>PDB</Systemcode> <!-- Справочник систем -->
+								  <Task>Поступила новая заявка</Task>
+								  <Comment>Тестируем  SPLANG</Comment>
+								  <Priority>P001</Priority>  <!-- Справочник приоритетов -->
+						 </Systems>				
+					</data>
+				</requestData>
+			</request>
+		</typ:SendMessage>
+	</soapenv:Body>
+</soapenv:Envelope>

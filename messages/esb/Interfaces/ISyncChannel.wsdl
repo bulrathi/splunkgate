@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions name="ISyncChannel" targetNamespace="http://ish.curs.kz/SyncChannel/v10/Interfaces" xmlns:tns="http://ish.curs.kz/SyncChannel/v10/Types" xmlns:tns0="http://ish.curs.kz/SyncChannel/v10/Interfaces" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <wsdl:types>
+    <xsd:schema targetNamespace="http://ish.curs.kz/SyncChannel/v10/Interfaces">
+            <xsd:import namespace="http://ish.curs.kz/SyncChannel/v10/Types" schemaLocation="../Types/ISyncChannel.xsd"/>            
+        </xsd:schema>
+  </wsdl:types>
+    <wsdl:message name="SendMessageRequestMsg">
+    <wsdl:part element="tns:SendMessage" name="SendMessageParameters"/>
+  </wsdl:message>
+    <wsdl:message name="SendMessageResponseMsg">
+    <wsdl:part element="tns:SendMessageResponse" name="SendMessageResult"/>
+  </wsdl:message>
+    <wsdl:message name="SendMessage_sendMessageFaultMsg">
+    <wsdl:part element="tns:SendMessageFault1_SendMessageFault" name="sendMessageFault"/>
+  </wsdl:message>
+    <wsdl:portType name="ISyncChannel">
+    <wsdl:documentation>Интерфейс для работы с синхронным каналом</wsdl:documentation>
+    <wsdl:operation name="SendMessage">
+      <wsdl:documentation>Метод отправки сообщения по синхронному каналу</wsdl:documentation>
+      <wsdl:input message="tns0:SendMessageRequestMsg" name="SendMessageRequest"/>
+      <wsdl:output message="tns0:SendMessageResponseMsg" name="SendMessageResponse"/>
+            <wsdl:fault message="tns0:SendMessage_sendMessageFaultMsg" name="sendMessageFault"/>
+        </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

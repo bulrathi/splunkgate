@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	targetNamespace="http://ish.curs.kz/SyncChannel/v10/Types/Request"
+	xmlns:bons1="http://ish.curs.kz/SyncChannel/v10/Types"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:bons2="http://ish.curs.kz/SyncChannel/v10/Types/Request">
+	<xsd:include schemaLocation="RequestData.xsd"></xsd:include>
+	<xsd:import namespace="http://ish.curs.kz/SyncChannel/v10/Types"
+		schemaLocation="SyncMessageInfo.xsd" />
+
+	<xsd:complexType name="SyncSendMessageRequest">
+		<xsd:annotation>
+      <xsd:documentation>Формат объекта запроса метода отправки сообщения по синхронному каналу</xsd:documentation>
+    </xsd:annotation>
+		<xsd:sequence>
+			<xsd:element minOccurs="1" name="requestInfo"
+				type="bons1:SyncMessageInfo">
+				<xsd:annotation>
+          
+        <xsd:documentation>Объект информация о сообщения запроса</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="1" name="requestData"
+				type="bons2:RequestData">
+				<xsd:annotation>
+          
+        <xsd:documentation>Объект передачи бизнес данных запроса</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

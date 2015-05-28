@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema targetNamespace="http://ish.curs.kz/SyncChannel/v10/Types/Response" xmlns:bons0="http://ish.curs.kz/SyncChannel/v10/Types/Response" xmlns:bons1="http://ish.curs.kz/SyncChannel/v10/Types" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:include schemaLocation="ResponseData.xsd"/>
+	<xsd:import namespace="http://ish.curs.kz/SyncChannel/v10/Types" schemaLocation="SyncMessageInfoResponse.xsd"/>
+
+	<xsd:complexType name="SyncSendMessageResponse">
+		<xsd:annotation>
+      <xsd:documentation>информация о сообщении ответе</xsd:documentation>
+    </xsd:annotation>
+		<xsd:sequence>
+			<xsd:element minOccurs="1" name="responseInfo" type="bons1:SyncMessageInfoResponse">
+				<xsd:annotation>
+          <xsd:documentation>Мета данные ответа</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="1" name="responseData" type="bons0:ResponseData">
+				<xsd:annotation>
+          
+        <xsd:documentation>Объект бизнесс данные ответа</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

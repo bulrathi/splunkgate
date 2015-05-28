@@ -1,0 +1,15 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+   <soap:Body>
+      <soap:Fault>
+         <faultcode>soap:Server</faultcode>
+         <faultstring>error</faultstring>
+         <detail>
+            <ns2:sendMessageFault1_sendMessageFault xmlns:ns2="http://ish.curs.kz/AsyncChannel/v10/Types">
+               <errorCode>100</errorCode>
+               <errorMessage>Сообщение не соответствует формату ИШ.</errorMessage>
+               <errorDate>2014-11-19T07:51:54.560+06:00</errorDate>
+            </ns2:sendMessageFault1_sendMessageFault>
+         </detail>
+      </soap:Fault>
+   </soap:Body>
+</soap:Envelope>

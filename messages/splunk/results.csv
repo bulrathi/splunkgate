@@ -1,0 +1,39 @@
+"_bkt","_cd","_indextime","_raw","_serial","_si","_sourcetype","_time",host,index,linecount,source,sourcetype,"splunk_server","__mv__bkt","__mv__cd","__mv__indextime","__mv__raw","__mv__serial","__mv__si","__mv__sourcetype","__mv__time","__mv_host","__mv_index","__mv_linecount","__mv_source","__mv_sourcetype","__mv_splunk_server"
+"main~42~159C916C-D74F-4EAD-AFFB-919816268C35","42:42622",1432623963,"05/26/2015 01:04:43 PM
+LogName=Application
+SourceName=Windows Error Reporting
+EventCode=1001
+EventType=4
+Type=Сведения
+ComputerName=Turniket.akimat.local
+TaskCategory=None
+OpCode=Сведения
+RecordNumber=15045008
+Keywords=Классический
+Message=Контейнер ошибки , тип 0
+Имя события: WindowsUpdateFailure
+Ответ: Нет данных
+Идентификатор CAB: 0
+
+Сигнатура проблемы:
+P1: 7.3.7600.16385
+P2: 80072efd
+P3: 00000000-0000-0000-0000-000000000000
+P4: Scan
+P5: 101
+P6: Unmanaged
+P7: 
+P8: 
+P9: 
+P10: 
+
+Вложенные файлы:
+
+Эти файлы можно найти здесь:
+C:\ProgramData\Microsoft\Windows\WER\ReportQueue\NonCritical_7.3.7600.16385_6e97ecc1309e8c3d4ef8c137976046be426690a_4587bb08
+
+Символ анализа: 
+Повторный поиск решения: 0
+Идентификатор отчета: 7b5f565c-0375-11e5-b583-001a4aa80a44
+Состояние отчета: 4",0,"splunk
+main","WinEventLog:Application",1432623883,Turniket,main,37,"WinEventLog:Application","WinEventLog:Application",splunk,,,,,,"$splunk$;$main$",,,,,,,,

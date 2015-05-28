@@ -1,0 +1,139 @@
+<wsdl:definitions xmlns:ns1="http://ish.curs.kz/SyncChannel/v10/Types" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ish.curs.kz/SyncChannel/v10/Interfaces" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ISyncChannelService" targetNamespace="http://ish.curs.kz/SyncChannel/v10/Interfaces">
+	<wsdl:types>
+		<xs:schema xmlns:tns="http://ish.curs.kz/common/v10/Types" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ish.curs.kz/common/v10/Types" version="1.0">
+			<xs:complexType name="SenderInfo">
+				<xs:sequence>
+					<xs:element name="senderId" type="xs:string"/>
+					<xs:element minOccurs="0" name="password" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="Property">
+				<xs:sequence>
+					<xs:element name="key" type="xs:string"/>
+					<xs:element name="value" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="StatusInfo">
+				<xs:sequence>
+					<xs:element name="code" type="xs:string"/>
+					<xs:element name="message" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="ErrorInfo">
+				<xs:sequence>
+					<xs:element name="errorCode" type="xs:string"/>
+					<xs:element name="errorMessage" type="xs:string"/>
+					<xs:element minOccurs="0" name="errorData" type="xs:string"/>
+					<xs:element name="errorDate" type="xs:dateTime"/>
+					<xs:element minOccurs="0" name="subError" type="tns:ErrorInfo"/>
+					<xs:element minOccurs="0" name="sessionId" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:schema>
+		<xs:schema xmlns:ns1="http://ish.curs.kz/SyncChannel/v10/Types" xmlns:tns="http://ish.curs.kz/SyncChannel/v10/Types/Response" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ish.curs.kz/SyncChannel/v10/Types/Response" version="1.0">
+			<xs:import namespace="http://ish.curs.kz/SyncChannel/v10/Types"/>
+			<xs:complexType name="SyncSendMessageResponse">
+				<xs:sequence>
+					<xs:element name="responseInfo" type="ns1:SyncMessageInfoResponse"/>
+					<xs:element name="responseData" type="tns:ResponseData"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="ResponseData">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="data" type="xs:anyType"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:schema>
+		<xs:schema xmlns:ns1="http://ish.curs.kz/SyncChannel/v10/Types" xmlns:tns="http://ish.curs.kz/SyncChannel/v10/Types/Request" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ish.curs.kz/SyncChannel/v10/Types/Request" version="1.0">
+			<xs:import namespace="http://ish.curs.kz/SyncChannel/v10/Types"/>
+			<xs:complexType name="SyncSendMessageRequest">
+				<xs:sequence>
+					<xs:element name="requestInfo" type="ns1:SyncMessageInfo"/>
+					<xs:element name="requestData" type="tns:RequestData"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="RequestData">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="data" type="xs:anyType"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:schema>
+		<xs:schema xmlns:ns1="http://ish.curs.kz/SyncChannel/v10/Types/Request" xmlns:ns2="http://ish.curs.kz/common/v10/Types" xmlns:ns3="http://ish.curs.kz/SyncChannel/v10/Types/Response" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://ish.curs.kz/SyncChannel/v10/Types" version="1.0">
+			<xs:import namespace="http://ish.curs.kz/SyncChannel/v10/Types/Request"/>
+			<xs:import namespace="http://ish.curs.kz/common/v10/Types"/>
+			<xs:import namespace="http://ish.curs.kz/SyncChannel/v10/Types/Response"/>
+			<xs:element name="SendMessage">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="request" nillable="true" type="ns1:SyncSendMessageRequest"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SendMessageFault1_SendMessageFault" nillable="true" type="ns2:ErrorInfo"/>
+			<xs:element name="SendMessageResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="response" nillable="true" type="ns3:SyncSendMessageResponse"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:complexType name="SyncMessageInfo">
+				<xs:sequence>
+					<xs:element name="messageId" type="xs:string"/>
+					<xs:element minOccurs="0" name="correlationId" type="xs:string"/>
+					<xs:element name="serviceId" type="xs:string"/>
+					<xs:element name="messageDate" type="xs:dateTime"/>
+					<xs:element minOccurs="0" name="routeId" type="xs:string"/>
+					<xs:element name="sender" type="ns2:SenderInfo"/>
+					<xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ns2:Property"/>
+					<xs:element minOccurs="0" name="sessionId" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="SyncMessageInfoResponse">
+				<xs:sequence>
+					<xs:element name="messageId" type="xs:string"/>
+					<xs:element minOccurs="0" name="correlationId" type="xs:string"/>
+					<xs:element name="responseDate" type="xs:dateTime"/>
+					<xs:element name="status" type="ns2:StatusInfo"/>
+					<xs:element minOccurs="0" name="sessionId" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="SendMessage">
+		<wsdl:part element="ns1:SendMessage" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="SendMessageResponse">
+		<wsdl:part element="ns1:SendMessageResponse" name="parameters"/>
+	</wsdl:message>
+	<wsdl:message name="SendMessageSendMessageFaultMsg">
+		<wsdl:part element="ns1:SendMessageFault1_SendMessageFault" name="SendMessageSendMessageFaultMsg"/>
+	</wsdl:message>
+	<wsdl:portType name="ISyncChannel">
+		<wsdl:operation name="SendMessage">
+			<wsdl:input message="tns:SendMessage" name="SendMessage"/>
+			<wsdl:output message="tns:SendMessageResponse" name="SendMessageResponse"/>
+			<wsdl:fault message="tns:SendMessageSendMessageFaultMsg" name="SendMessageSendMessageFaultMsg"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="ISyncChannelServiceSoapBinding" type="tns:ISyncChannel">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="SendMessage">
+			<soap:operation soapAction="" style="document"/>
+			<wsdl:input name="SendMessage">
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output name="SendMessageResponse">
+				<soap:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="SendMessageSendMessageFaultMsg">
+				<soap:fault name="SendMessageSendMessageFaultMsg" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="ISyncChannelService">
+		<wsdl:port binding="tns:ISyncChannelServiceSoapBinding" name="ISyncChannelPort">
+			<soap:address location="http://192.168.10.120:7999/sca/SyncChannelService"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

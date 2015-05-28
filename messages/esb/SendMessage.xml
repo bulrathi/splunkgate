@@ -1,0 +1,62 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://ish.curs.kz/SyncChannel/v10/Types">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<typ:SendMessage>
+			<request>
+				<requestInfo>
+					<messageId>123</messageId>
+					<correlationId></correlationId> <!-- Проставляет шина -->
+					<serviceId>IDS</serviceId>					
+					<messageDate>2014-05-22T13:58:44.571Z</messageDate>
+					<routeId>ROUTE01</routeId>
+					<sender>
+						<senderId>META</senderId>
+						<password></password>
+					</sender>					
+					<properties>
+						<key>SenderManager</key>
+						<value>Джумашева Л.</value>				
+					</properties>
+					<properties>
+						<key>Telephone</key>
+						<value>+7-(777)-xxx-75-x9</value>
+					</properties>
+					<properties>
+						<key>ReceiverManager</key>
+						<value>Маканова А.</value>				
+					</properties>
+					<properties>
+						<key>Telephone</key>
+						<value>+7-(705)-xxx-x5-3x</value>
+					</properties>
+					<properties>
+						<key>Meta_Action</key>
+						<value>Append</value>
+					</properties>					
+				</requestInfo>
+				<requestData>
+					<!--Optional:-->
+					<data>
+						<QueryStructureResponse>
+							<StatusMessage status="Success"/>
+							<CodeLists>
+								<CodeList classcod="SP" agencyID="METADATA" version="1.0" classid="1" senddate="2014-10-09T14:23:53+06:00">
+									<Name xml:lang="ru">Справочник по полу</Name>
+									<Name xml:lang="kz">Жыныс бойынша анықтама</Name>
+									<Code id="741935" idVer="2406801" parId="0" cod="0" begDate="1990-01-01T00:00:00" endDate="" updDate="2012-10-16T22:07:07">
+										<Description xml:lang="ru">Всего</Description>
+										<Description xml:lang="kz">Барлығы</Description>
+									</Code>
+									<Code id="43036" idVer="1332007" parId="741935" cod="1" begDate="1990-01-01T00:00:00" endDate="" updDate="2012-10-16T22:06:33">
+										<Description xml:lang="ru">Мужской</Description>
+										<Description xml:lang="kz">Еркек</Description>
+									</Code>										
+								</CodeList>
+							</CodeLists>
+						</QueryStructureResponse>				
+					</data>
+				</requestData>
+			</request>
+		</typ:SendMessage>
+	</soapenv:Body>
+</soapenv:Envelope>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema targetNamespace="http://ish.curs.kz/SyncChannel/v10/Types" xmlns:bons0="http://ish.curs.kz/common/v10/Types" xmlns:bons1="http://ish.curs.kz/SyncChannel/v10/Types/Request" xmlns:bons2="http://ish.curs.kz/SyncChannel/v10/Types/Response" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://ish.curs.kz/common/v10/Types" schemaLocation="../../../common/v10/Types/ErrorInfo.xsd"/>
+    <xsd:import namespace="http://ish.curs.kz/SyncChannel/v10/Types/Response" schemaLocation="SyncSendMessageResponse.xsd"/>
+    <xsd:import namespace="http://ish.curs.kz/SyncChannel/v10/Types/Request" schemaLocation="SyncSendMessageRequest.xsd"/>
+            <xsd:element name="SendMessage">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="request" nillable="true" type="bons1:SyncSendMessageRequest">
+              <xsd:annotation>
+                
+              <xsd:documentation>Объект запроса</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="SendMessageResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="response" nillable="true" type="bons2:SyncSendMessageResponse">
+              <xsd:annotation>
+                
+              <xsd:documentation>Объект ответа</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+            <xsd:element name="SendMessageFault1_SendMessageFault" nillable="true" type="bons0:ErrorInfo"/>
+        </xsd:schema>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema targetNamespace="http://ish.curs.kz/SyncChannel/v10/Types" xmlns:bons1="http://ish.curs.kz/common/v10/Types" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://ish.curs.kz/common/v10/Types" schemaLocation="../../../common/v10/Types/StatusInfo.xsd"/>
+    <xsd:import namespace="http://ish.curs.kz/common/v10/Types" schemaLocation="../../../common/v10/Types/Guid.xsd"/>
+	<xsd:complexType name="SyncMessageInfoResponse">
+		<xsd:sequence>
+			<xsd:element minOccurs="1" name="messageId" type="xsd:string">
+				<xsd:annotation>
+          
+        <xsd:documentation>Идентификатор сообщения в системе получателя (заполняет система получателя запроса (система отрабатывающая сообщение)</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+
+			<xsd:element minOccurs="0" name="correlationId" type="xsd:string">
+				<xsd:annotation>
+          
+        <xsd:documentation>Идентификатор цепочки сообщения в системе получателя запроса (если сообщения существует в рамках цепочки сообщений системы отправителя(система отрабатывающая сообщение)</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="1" name="responseDate" type="xsd:dateTime">
+				<xsd:annotation>
+          
+        <xsd:documentation>Дата ответа в системе получателя запроса(заполняется системой получателя запроса)</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+
+			<xsd:element minOccurs="1" name="status" type="bons1:StatusInfo">
+				<xsd:annotation>
+          
+        <xsd:documentation>Объект информации о статусе</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="sessionId" type="bons1:guid">
+				<xsd:annotation>
+          
+        <xsd:documentation>Идентификатор сессии на ИС ИШ. Устанавливается на ИС ИШ. При отправки ответа системой получателя запроса заполнять не нужно.</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

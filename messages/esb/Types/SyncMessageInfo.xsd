@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema targetNamespace="http://ish.curs.kz/SyncChannel/v10/Types" xmlns:bons1="http://ish.curs.kz/common/v10/Types" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:import namespace="http://ish.curs.kz/common/v10/Types" schemaLocation="../../../common/v10/Types/SenderInfo.xsd"/>
+    <xsd:import namespace="http://ish.curs.kz/common/v10/Types" schemaLocation="../../../common/v10/Types/Property.xsd"/>
+    <xsd:import namespace="http://ish.curs.kz/common/v10/Types" schemaLocation="../../../common/v10/Types/Guid.xsd"/>
+	<xsd:complexType name="SyncMessageInfo">
+		<xsd:sequence>
+
+			<xsd:element minOccurs="1" name="messageId" type="xsd:string">
+				<xsd:annotation>
+          
+        <xsd:documentation>Идентификатор сообщения в системе отправителя (заполняется системой отправителя)</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="correlationId" type="xsd:string">
+				<xsd:annotation>
+          
+        <xsd:documentation>Идентификатор цепочки сообщений. Генерируется ИС ИШ. В случае когда сообщение передается получателю номер будет проставлен ИС ИШ.
+	</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="1" name="serviceId" type="xsd:string">
+				<xsd:annotation>
+          
+        <xsd:documentation>Идентификатор взаимодействия, по реестру взаимодействий ИС ИШ</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="1" name="messageDate" type="xsd:dateTime">
+				<xsd:annotation>
+          
+        <xsd:documentation>Дата создания сообщения в системе отправителя (заполняется отправителем)</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+
+			<xsd:element minOccurs="0" name="routeId" type="xsd:string">
+				<xsd:annotation>
+          
+        <xsd:documentation>Идентификатор маршурута сообщения ( идентификатор по реестру, заполняется системой отправителя)
+	</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="1" name="sender" type="bons1:SenderInfo">
+				<xsd:annotation>
+          <xsd:documentation>Объест информация об отправителе (заполняется отправителем)</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element maxOccurs="unbounded" minOccurs="0" name="properties" type="bons1:Property">
+				<xsd:annotation>
+          <xsd:documentation>Массив своиств, можно добавить дополнительные своиства запроса (по согласовнию с ИС ИШ и системой получателя)</xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="sessionId" type="bons1:guid">
+				<xsd:annotation>
+          <xsd:documentation>Идентификатор сессии ИС ИШ. Заполняется на ИС ИШ, отправителю заполнять не надо. </xsd:documentation>
+        </xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
