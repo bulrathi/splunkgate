@@ -14,24 +14,35 @@ class DBLayer:
   def __init__(self, logger, config):
     """
     Инициализация класса
-    В configFile передается dict, содежащий конфигурацию SplunkGate 
+    В configFile передается dict, содежащий конфигурацию SplunkGate
     В logger передает объект-логгер
     """
 
     cur = None
     self.logger = logger
     self.config = config
-    self.conn = sqlite3.connect(self.config['splunkgate.db'])
+    self.conn = sqlite3.connect(self.config['database'])
     self.conn.text_factory = str
 
     with self.conn:
       cur = self.conn.cursor()
-      cur.execute('create table if not exists tickets (event_code integer, event_type integer, computer_name varchar(1000), message varchar(2048), message_id varchar(1024), create_date timestamp not null default current_timestamp, send_to_esb_date timestamp, esb_status varchar(1024), primary key(event_code, event_type, computer_name))')
+      cur.execute("""CREATE TABLE IF NOT EXISTS tickets
+        (event_code integer,
+          event_type integer,
+          computer_name varchar(1000),
+          message varchar(2048),
+          message_id varchar(1024),
+          create_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          send_to_esb_date timestamp,
+          esb_status varchar(1024),
+          primary key(event_code, event_type, computer_name)
+        )""")
+
       cur.close()
       self.conn.commit()
 
 
-  def setTicket(self, eventCode, eventType, computerName, message, messageId):
+  def setTicket(self, ticket):
     """
     Сохранить тикет в БД
     eventCode - код события
@@ -43,12 +54,12 @@ class DBLayer:
     with self.conn:
 
       cur = self.conn.cursor()
-      cur.execute('insert into tickets (event_code, event_type, computer_name, message, message_id) values (?, ?, ?, ?, ?)', (eventCode, eventType, computerName, message, str(messageId)))
+      cur.execute('INSERT INTO tickets (event_code, event_type, computer_name, message, message_id) VALUES (:eventCode, :eventType, :computerName, :message, :messageId)', (ticket))
       self.conn.commit()
       cur.close()
 
 
-  def getTicket(self, eventCode, eventType, computerName):
+  def getTicket(self, ticketParam):
     """
     Получить тикет из базы данных
     eventCode - код события
@@ -59,7 +70,9 @@ class DBLayer:
     ticket = {}
     with self.conn:
       cur = self.conn.cursor()
-      cur.execute('select event_code, event_type, computer_name, message, message_id from tickets where event_code = ? and event_type = ? and computer_name = ?', (eventCode, eventType, computerName))
+
+      cur.execute('SELECT event_code, event_type, computer_name, message, message_id FROM tickets WHERE event_code = :eventCode AND event_type = :eventType AND computer_name = :computerName', (ticketParam))
+
       row = cur.fetchone()
       if row:
         ticket['eventCode'] = row[0]
@@ -72,7 +85,7 @@ class DBLayer:
       return ticket
 
 
-  def updateTicket(self, status, eventCode, eventType, computerName):
+  def updateTicket(self, ticket):
     """
     Обновить запись с тикетом
     status - статус заказа в Jira
@@ -83,5 +96,8 @@ class DBLayer:
 
     with self.conn:
       cur = self.conn.cursor()
-      cur.execute('update tickets set send_to_esb_date = current_timestamp, esb_status = ? where event_code = ? and event_type = ? and computer_name = ?', (status, eventCode, eventType, computerName))
+      cur.execute("""UPDATE tickets SET send_to_esb_date = CURRENT_TIMESTAMP, esb_status = %(status)s
+        WHERE event_code = %(eventCode)s
+        AND event_type = %(eventType)s
+        AND computer_name = %(computerName)s""", (ticket))
       self.conn.commit()

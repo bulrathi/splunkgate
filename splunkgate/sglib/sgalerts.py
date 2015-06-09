@@ -13,7 +13,7 @@ class AlertHandler:
   def __init__(self, logger, config):
     """
     Инициализация класса
-    В config передается dict, содежащий конфигурацию SplunkGate 
+    В config передается dict, содежащий конфигурацию SplunkGate
     В logger передает объект-логгер
     """
 
@@ -29,16 +29,16 @@ class AlertHandler:
     Имя снапшота генерируется из текущего timestamp и возвращается в ответе метода.
     """
     try:
-      file = self.config['splunk.logpath']
-      file1 = self.config['splunkgate.workpath'] + str(int(time.time())) + '.log'
+      file = self.config['log']
+      file1 = self.config['snapshotPath'] + str(int(time.time())) + '.log'
 
       # Если к конфигурационном файле в [SplunkGate].CreateSnapshot стоит значение 'false', то снапшот не создается.
-      if self.config['splunkgate.сreateSnapshot']:
+      if self.config['createSnapshot']:
         self.logger.info('Create Splunk log snapshot: ' + file1)
 
         shutil.move(file, file1)
         open(file, 'a').close()
-      
+
       else:
         file1 = file
 
@@ -72,9 +72,9 @@ class AlertHandler:
 
     else:
       response = []
-      if self.config['splunkgate.readOnlyFirstElement'] == False:
+      if self.config['readOnlyFirstElement'] == False:
         response = alerts
-      
+
       else:
         a = []
         if len(alerts) > 0:
@@ -82,7 +82,7 @@ class AlertHandler:
           response = a
         else:
           pass
-        if self.config['splunk.debug'] == 'true':
+        if self.config['debug'] == 'true':
           print response
 
       return response
@@ -95,31 +95,32 @@ class AlertHandler:
     f = None
 
     self.logger.info("Parse alert: " + str(alert))
-    
-    # Получить имя файла с подробным описание проблемы 
+
+    # Получить имя файла с подробным описание проблемы
     try:
       fcomment = alert[7]
       if os.path.isfile(fcomment):
         # Если файл существует, то распаковать его из GZip и прочитать его
         f = gzip.open(fcomment, 'rb')
         t = f.readlines()
-        
+
         # Выделить интересующие поля
+        ticket['alert'] = alert[3]
         ticket['eventCode'] = t[4][0:-1].split('=')[1]
         ticket['eventType'] = t[5][0:-1].split('=')[1]
-        ticket['message'] = t[12][0:-1].split('=')[1]   
+        ticket['message'] = t[12][0:-1].split('=')[1]
         ticket['computerName'] = t[7][0:-1].split('=')[1]
 
         # Сформировать тело сообщения в Jira
         ticket['comment'] = t[4] + t[5] + t[7] + t[12]
-        
+
         self.logger.info("Parse ticket: " + str(ticket))
         return ticket
 
       else:
         # Если файл не существует, вернуть ошибку
         raise Exception('File not found', fcomment)
-    
+
     except Exception, e:
       self.logger.error('Unsuccess parse alert from Splunk log: ' + str(e))
       raise Exception(e)

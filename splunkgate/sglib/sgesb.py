@@ -11,22 +11,35 @@ class ESBHandler:
   def __init__(self, logger, config):
     """
     Инициализация класса
-    В configFile передается dict, содежащий конфигурацию SplunkGate 
+    В configFile передается dict, содежащий конфигурацию SplunkGate
     В logger передает объект-логгер
     """
     self.logger = logger
     self.config = config
 
 
-  def createSOAPMessage(self, id, systemCode, task, comment, priority):
+  def createTicketMessage(self, parameters):
+    return """<Systems>
+    <Systemcode>%s</Systemcode>
+    <Task>%s</Task>
+    <Comment>&quot;%s&quot;</Comment>
+    <Priority>%s</Priority></Systems>""" % ('SMAC', parameters['alert'], parameters['comment'], 'P002')
+
+
+  def createGetTicketStatusMessage(self, parameters):
+    return """<issueId>%s</issueId>""" %  (parameters['issueId'])
+
+
+  def createSOAPMessage(self, parameters, messageType):
     """
     Создать SOAP-сообщения для отправки в ESB
-    id - идентификатор сообщения
-    systemCode - код системы - инициатора сообщения
-    task - описание задачи, создаваемой в Jira
-    comment - комментарий к задаче в Jira
-    priority - приоритет
     """
+
+    if messageType == 1:
+      message = self.createTicketMessage(parameters)
+    else:
+      message = self.createGetTicketStatusMessage(parameters)
+
 
     param = """<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://ish.curs.kz/SyncChannel/v10/Types">
       <soapenv:Header/>
@@ -34,13 +47,13 @@ class ESBHandler:
         <typ:SendMessage>
           <request>
             <requestInfo>
-              <messageId>""" + str(id) + """</messageId>
-              <serviceId>""" + self.config["esb.serviceId"] + """</serviceId>
-              <messageDate>""" + str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%s%z")) + """</messageDate>
-              <routeId>""" + self.config["esb.routeId"] + """</routeId>
+              <messageId>%s</messageId>
+              <serviceId>%s</serviceId>
+              <messageDate>%s</messageDate>
+              <routeId>%s</routeId>
               <sender>
-                <senderId>""" + self.config["esb.login"] + """</senderId>
-                <password>""" + self.config["esb.password"] +"""</password>
+                <senderId>%s</senderId>
+                <password>%s</password>
               </sender>
               <properties>
                 <key/>
@@ -49,19 +62,18 @@ class ESBHandler:
               <sessionId/>
             </requestInfo>
             <requestData>
-              <data>
-                <Systems>
-                  <Systemcode>""" + systemCode + """</Systemcode>
-                  <Task>""" + task + """</Task>
-                  <Comment>""" + comment + """</Comment>
-                  <Priority>""" + priority + """</Priority>
-                </Systems>
-              </data>
+              <data>%s</data>
             </requestData>
           </request>
         </typ:SendMessage>
       </soapenv:Body>
-    </soapenv:Envelope>"""
+    </soapenv:Envelope>""" % (parameters['messageId'],
+      parameters['serviceId'],
+      str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%s%z")),
+      parameters['routeId'],
+      parameters['login'],
+      parameters['password'],
+      message)
 
     return param
 
@@ -72,19 +84,20 @@ class ESBHandler:
     data = None
 
     headers = {"Content-type": "text/xml; charset=utf-8", "SOAPAction": ""}
-
-    log = ''.join(['Call ESB: host=http://', self.configParams['esb.host'], self.configParams['esb.url'], ';http headers=', str(headers), ';message=', message])
+    print message
+    log = ''.join(['Call ESB: host=http://', self.config['host'], self.config['url'], ';http headers=', str(headers), ';message=', message])
     self.logger.info(log)
 
     try:
-      conn = httplib.HTTPConnection(self.configParams["esb.host"])
-      conn.request("POST", self.configParams["esb.url"], message, headers)
+      conn = httplib.HTTPConnection(self.config["host"])
+      conn.request("POST", self.config["url"], message, headers)
       response = conn.getresponse()
       status = response.status
       reason = response.reason
-
-      log = ''.join(['Success call ESB: status=', str(status), ';reason=', str(reason), ';data=', str(response.read())])
-      self.logger.info(log)
+      print response.read()
+      #print reason
+      #log = ''.join(['Success call ESB: status=', str(status), ';reason=', str(reason), ';data=', str(response.read())])
+      #self.logger.info(log)
 
       data = response.read()
 
@@ -95,3 +108,15 @@ class ESBHandler:
       conn.close()
 
     return data
+
+
+  def createTicket(self, parameters):
+    message = self.createSOAPMessage(parameters, 1)
+    self.sendSOAPMessage(message)
+
+
+  def getTicketStatus(self, parameters):
+    message = self.createSOAPMessage(parameters, 2)
+    self.sendSOAPMessage(message)
+
+
