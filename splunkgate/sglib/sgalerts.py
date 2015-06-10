@@ -112,7 +112,9 @@ class AlertHandler:
         ticket['computerName'] = t[7][0:-1].split('=')[1]
 
         # Сформировать тело сообщения в Jira
-        ticket['comment'] = t[4] + t[5] + t[7] + t[12]
+        comment = t[4] + t[5] + t[7] + t[12]
+        comment = comment.replace('\n', ';').replace('\r', '')
+        ticket['comment'] = comment
 
         self.logger.info("Parse ticket: " + str(ticket))
         return ticket

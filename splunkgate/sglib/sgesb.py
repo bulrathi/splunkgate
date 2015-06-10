@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import httplib, urllib
 from datetime import datetime, date, time
 
@@ -22,7 +23,7 @@ class ESBHandler:
     return """<Systems>
     <Systemcode>%s</Systemcode>
     <Task>%s</Task>
-    <Comment>&quot;%s&quot;</Comment>
+    <Comment>%s</Comment>
     <Priority>%s</Priority></Systems>""" % ('SMAC', parameters['alert'], parameters['comment'], 'P002')
 
 
@@ -94,12 +95,11 @@ class ESBHandler:
       response = conn.getresponse()
       status = response.status
       reason = response.reason
-      print response.read()
-      #print reason
-      #log = ''.join(['Success call ESB: status=', str(status), ';reason=', str(reason), ';data=', str(response.read())])
-      #self.logger.info(log)
-
       data = response.read()
+
+      log = ''.join(['Success call ESB: status=', str(status), ';reason=', str(reason), ';data=', data])
+      self.logger.info(log)
+
 
     except Exception, e:
       self.logger.error('Unsuccess call ESB: '+ str(e))
@@ -112,7 +112,13 @@ class ESBHandler:
 
   def createTicket(self, parameters):
     message = self.createSOAPMessage(parameters, 1)
-    self.sendSOAPMessage(message)
+    response = self.sendSOAPMessage(message)
+    b = response.find('{')
+    e = response.find('}')
+    j = response[b:e+1]
+    j = j.replace('&quot;','"')
+    resp = json.loads(j)
+    return resp
 
 
   def getTicketStatus(self, parameters):

@@ -34,7 +34,8 @@ class DBLayer:
           message_id varchar(1024),
           create_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
           send_to_esb_date timestamp,
-          esb_status varchar(1024),
+          jira_key varchar(1024),
+          jira_id integer,
           primary key(event_code, event_type, computer_name)
         )""")
 
@@ -71,7 +72,7 @@ class DBLayer:
     with self.conn:
       cur = self.conn.cursor()
 
-      cur.execute('SELECT event_code, event_type, computer_name, message, message_id FROM tickets WHERE event_code = :eventCode AND event_type = :eventType AND computer_name = :computerName', (ticketParam))
+      cur.execute('SELECT event_code, event_type, computer_name, message, message_id, jira_id, jira_key FROM tickets WHERE event_code = :eventCode AND event_type = :eventType AND computer_name = :computerName', (ticketParam))
 
       row = cur.fetchone()
       if row:
@@ -80,6 +81,8 @@ class DBLayer:
         ticket['computerName'] = row[2]
         ticket['message'] = row[3]
         ticket['messageId'] = row[4]
+        ticket['jira_id'] = row[5]
+        ticket['jira_key'] = row[6]
 
       cur.close()
       return ticket
@@ -96,8 +99,5 @@ class DBLayer:
 
     with self.conn:
       cur = self.conn.cursor()
-      cur.execute("""UPDATE tickets SET send_to_esb_date = CURRENT_TIMESTAMP, esb_status = %(status)s
-        WHERE event_code = %(eventCode)s
-        AND event_type = %(eventType)s
-        AND computer_name = %(computerName)s""", (ticket))
+      cur.execute('UPDATE tickets SET send_to_esb_date = CURRENT_TIMESTAMP, jira_key = :jiraKey, jira_id = :jiraId WHERE event_code = :eventCode AND event_type =:eventType AND computer_name = :computerName', (ticket))
       self.conn.commit()

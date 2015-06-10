@@ -69,7 +69,6 @@ if __name__ == "__main__":
     except Exception, e:
       logger.error(e)
 
-    #print config['splunk.servers'].get(ticket.get('computerName'))
     ticket['serviceId'] = opts['esb']['serviceId']
     ticket['routeId'] = opts['esb']['routeId']
     ticket['login'] = opts['esb']['login']
@@ -79,17 +78,15 @@ if __name__ == "__main__":
     ticket1 = db.getTicket(ticket)
     print ticket1
     if ticket1:
-      print 'Find ticket:', ticket
+      logger.info('Find ticket: %s', ticket1)
 
     else:
-      print 'Not find ticket:', ticket
+      logger.info('No find ticket: %s', ticket)
       db.setTicket(ticket)
-      esb.createTicket(ticket)
-
-      #message = gate.createSOAPMessage(id, 'SMAC', alert[3], comment, 'P002')
-      #response = gate.sendSOAPMessage(message)
-      #logger.info(''.join(['Get response: ', str(response)]))
-    #  db.updateTicket(status, eventCode, eventType, computerName)
+      resp = esb.createTicket(ticket)
+      ticket['jiraId'] = resp['id']
+      ticket['jiraKey'] = resp['key']
+      db.updateTicket(ticket)
 
   logger.info('Stop SplunkGate')
 
