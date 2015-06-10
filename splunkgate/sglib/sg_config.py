@@ -9,17 +9,21 @@ import ConfigParser
 from optparse import OptionParser
 from optparse import OptionGroup
 
-class Configuration(object):
+class configuration(object):
+  
   def __init__(self, fname):
     self.fname = fname
     self.config = ConfigParser.RawConfigParser()
     self.config.read(fname)
 
+
   def get_sections(self):
     return self.config.sections()
 
+
   def get_config(self, section):
     return self.config.items(section)
+
 
   def get_errors_list(self, section):
     errors = self.config.items(section)
@@ -30,13 +34,17 @@ class Configuration(object):
       err_list[error[0]] = _e_d
     return err_list
 
+
   def get_server_list(self, section):
     servers = self.config.items(section)
-    print servers
     server_list = {}
     for server in servers:
-      server_list[server[0]] = server[1]
+      _s = server[1].split(',')
+      _s = map(lambda it: it.strip(), _s)
+      _s = map(lambda it: it.replace("'", ''), _s)
+      server_list[server[0].lower()] = _s
     return server_list
+
 
   def get_options(self, section):
     options = self.config.items(section)
@@ -45,20 +53,26 @@ class Configuration(object):
       opt_list[opt[0]] = opt[1]
     return opt_list
 
+
   def get_list(self, section, option):
     return [chunk.strip().strip('\n') for chunk in self.config.get(section, option).split(',')]
+
 
   def get_option_str(self, section, option):
     return self.config.get(section, option)
 
+
   def get_option_int(self, section, option):
     return self.config.getint(section, option)
+
 
   def get_option_bool(self, section, option):
     return self.config.getboolean(section, option)
 
+
   def get_option_float(self, section, option):
     return self.config.getfloat(section, option)
+
 
   def get_modules(self):
     modules = self.get_list('modules', 'modules')
@@ -69,6 +83,7 @@ class Configuration(object):
       modules_part[module] = dict(methods = module_list, errors = errors)
     return modules_part
 
+
   def get_logger(self, section, loggername):
     lvl_dscr = self.config.get(section, 'level')
     level = None
@@ -78,6 +93,7 @@ class Configuration(object):
     elif lvl_dscr in 'critical': level = logging.CRITICAL
     elif lvl_dscr in 'exception': level = logging.EXCEPTION
     else: level = logging.DEBUG
+
 
     logging.basicConfig(format = self.config.get(section, 'format'),
       level = level,

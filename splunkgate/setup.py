@@ -1,27 +1,24 @@
 #!/usr/bin/python
 
+__author__  = "bw"
+__version__ = "0.1.0"
+
 import sys
 sys.path.append("sglib") 
 
 from cx_Freeze import setup, Executable
 
-print sys.platform
-
 base = None
-if sys.platform == 'win32':
-    base = 'Win32GUI'
 
 options = {
     'build_exe': {
-        'includes': ['sgconfig', 'sglogger', 'sgdb', 'sgesb'],
+        'includes': ['sg_config', 'sg_db', 'sg_esb', 'sg_alerts'],
     }
 }
 
 executables = [
     Executable('splunkgate.py', base=base)
 ]
-#includes = ['ConfigParser']
-#build_exe_options = {'include_files': ["sglib/sgconfig.py", "sglib/sglogger.py", "sglib/sgdb.py", "sglib/sgesb.py"]}
 
 setup(
   name = "SplunkGate",

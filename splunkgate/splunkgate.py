@@ -1,26 +1,38 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+__author__  = "bw"
+__version__ = "0.1.0"
+
+import os
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 import uuid
-import shutil
 
 sys.path.append("sglib")
-from sgconfig import Configuration
-from sglogger import SplunkLogger
-from sgdb import DBLayer
-from sgalerts import AlertHandler
-from sgesb import ESBHandler
+from sg_config import configuration
+from sg_db import db_layer
+from sg_alerts import alert_handler
+from sg_esb import esb_handler
 
 
-if __name__ == "__main__":
-  """Инициация SplunkGate"""
+class _AlertType:
+  """
+  Типы алертов
+  """
 
-  # Инициировать систему конфигурации
-  config = Configuration(sys.argv[1])
+  WIN  = 1
+  UNIX = 2
+
+
+def _get_config(fname):
+  """
+  Получить конфигурацию гейта
+  """
+
+  config = configuration(fname)
   opts = dict(
     logger = config.get_logger('logger', __name__),
     esb = dict(
@@ -29,64 +41,168 @@ if __name__ == "__main__":
       login = config.get_option_str('esb','login'),
       password = config.get_option_str('esb','password'),
       serviceId = config.get_option_str('esb','serviceId'),
-      routeId = config.get_option_str('esb','routeId')
+      routeId = config.get_option_str('esb','routeId'),
+      systemCode = config.get_option_str('esb','systemCode'),
+      priority = config.get_option_str('esb','priority'),
+      timeout = config.get_option_int('esb','timeout')
     ),
     splunkgate = dict(
-      database = config.get_option_str('splunkgate','database')
+      database = config.get_option_str('splunkgate','database'),
+      pid = config.get_option_str('splunkgate','pid')
     ),
     splunk = dict(
-      log = config.get_option_str('splunk','log'),
+      logWin = config.get_option_str('splunk','logWin'),
+      logUnix = config.get_option_str('splunk','logUnix'),
       debug = config.get_option_bool('splunk','debug'),
       snapshotPath = config.get_option_str('splunk','snapshotPath'),
       readOnlyFirstElement = config.get_option_bool('splunk','readOnlyFirstElement'),
       createSnapshot = config.get_option_bool('splunk','createSnapshot'),
       servers = config.get_server_list('splunk.servers')
+    ),
+    jira = dict(
+      openStatus = config.get_list('jira', 'open_status'),
+      closeStatus = config.get_list('jira', 'close_status'),
     )
   )
-  print opts
 
-  logger = opts['logger']
-  logger.info('Start SplunkGate')
+  return opts
 
-  # Инициировать базу данных
-  db = DBLayer(logger, opts['splunkgate'])
 
-  # Инициировать подключение к ESB
-  esb = ESBHandler(logger, opts['esb'])
+def _create_ticket(esb, db, ticket):
+  """
+  Создание тикета в JIRA
+  """
 
-  # Инициировать систему получения сообщений от Splunk
-  splunkAlerts = AlertHandler(logger, opts['splunk'])
+  # попробовать создать тикет в JIRA
+  resp = esb.create_ticket(ticket)
+  
+  if 'message' in resp:
+    # вернулось сообщение, которое не удалось распарсить
+    logger.error('Get unparsible message: %s', resp)
+          
+  else:
+    # тикет создан в JIRA
+    ticket['jiraId'] = resp['id']
+    ticket['jiraKey'] = resp['key']
+    ticket['jiraStatusId'] = None
+    # обновить тикет в БД гейта
+    db.update_ticket(ticket)
 
-  # Получить сообщения из Splunk
-  alerts = splunkAlerts.getAlert()
 
-  # Начать обработку сообщений из Splunk
-  for alert in alerts:
-    try:
-      ticket = splunkAlerts.parseAlert(alert)
-      ticket['messageId'] = str(uuid.uuid1())
+def _parse_alert(config, logger, splunk_alerts, esb, db, alert, alert_type):
+  """
+  Обработка алертов
+  """
 
-    except Exception, e:
-      logger.error(e)
+  try:
+    if alert_type == _AlertType.WIN:
+      # алерт от Windows-серверов
+      ticket = splunk_alerts.parse_win_alert(alert)
+    else: 
+      # алерт от UNIX-серверов
+      ticket = splunk_alerts.parse_unix_alert(alert)
+    
+    ticket['messageId'] = str(uuid.uuid1())
 
-    ticket['serviceId'] = opts['esb']['serviceId']
-    ticket['routeId'] = opts['esb']['routeId']
-    ticket['login'] = opts['esb']['login']
-    ticket['password'] = opts['esb']['password']
+  except Exception, e:
+    logger.error(e)
 
-    ticket1 = None
-    ticket1 = db.getTicket(ticket)
-    print ticket1
-    if ticket1:
-      logger.info('Find ticket: %s', ticket1)
+  # найти тикет в БД гейта
+  ticket1 = None
+  ticket1 = db.get_ticket(ticket)
+  
+  if ticket1:
+    # тикет найден в БД гейта
+
+    ticket['jiraId'] = ticket1['jiraId']
+    ticket['jiraKey'] = ticket1['jiraKey']
+
+    if ticket['jiraId']:
+      # в БД гейта у тикета уже есть ID тикета в JIRA
+      logger.info('Find ticket: %s, check state in JIRA', ticket)
+      # получить статус тикета в JIRA
+      resp = esb.get_ticket_status(ticket)
+      # получаем ID тикета в JIRA
+      ticket['jiraStatusId'] = resp['fields']['status']['id']
+      if ticket['jiraStatusId'] in config['closeStatus']:
+        # если тикет закрыт в JIRA, то создаем новые
+        _create_ticket(esb, db, ticket)
+
+      # обновисть статус тикета в БД гейта
+      db.update_ticket(ticket)
 
     else:
-      logger.info('No find ticket: %s', ticket)
-      db.setTicket(ticket)
-      resp = esb.createTicket(ticket)
-      ticket['jiraId'] = resp['id']
-      ticket['jiraKey'] = resp['key']
-      db.updateTicket(ticket)
+      # тикет есть в БД гейта, но не имеет ID JIRA, возможно, он не был создан в JIRA
+      logger.info('Find ticket: %s, but not create in JIRA, try for create ticket in JIRA', ticket)
+      # пробуем создать тикет в JIRA
+      _create_ticket(esb, db, ticket)
 
-  logger.info('Stop SplunkGate')
+  else:
+    # тикет не найден в БД гейта
+    logger.info('No find ticket: %s, create ticket in JIRA', ticket)
+    # создать тикет в БД гейта
+    db.set_ticket(ticket)
+    # попробовать создать тикет в JIRA
+    _create_ticket(esb, db, ticket)
+
+
+if __name__ == "__main__":
+  is_clear_pid = True
+  pidfile = None
+  logger = None
+
+  try:
+    opts = _get_config(sys.argv[1])
+    
+    logger = opts['logger']
+    logger.info('Start SplunkGate')
+
+    # проверка, что не запущен еще один экземпляр гейта
+    pid = str(os.getpid())
+    pidfile = opts['splunkgate']['pid']
+    
+    if os.path.isfile(pidfile):
+      # если найден PID-файл, завершить работу
+      logger.warning("%s already exists, exiting", pidfile)
+      is_clear_pid = False
+      sys.exit()
+    else:
+      # PID-файл не найден, создать и продолжить
+      file(pidfile, 'w').write(pid)
+
+    # Инициировать базу данных
+    db = db_layer(logger, opts['splunkgate'])
+
+    # Инициировать подключение к ESB
+    esb = esb_handler(logger, opts['esb'])
+
+    # Инициировать систему получения сообщений от Splunk
+    splunk_alerts = alert_handler(logger, opts['splunk'])
+
+    # Получить сообщения из Splunk
+    alerts = splunk_alerts.get_alert()
+
+    # Начать обработку сообщений из Splunk
+    # обработка алерты от Windows-серверов
+    for alert in alerts['win']:
+      _parse_alert(opts['jira'], logger, splunk_alerts, esb, db, alert, _AlertType.WIN)
+
+    # обработка алерты от UNIX-серверов
+    for alert in alerts['unix']:
+      _parse_alert(opts['jira'], logger, splunk_alerts, esb, db, alert, _AlertType.UNIX)
+
+    logger.info('Stop SplunkGate')
+  
+  except Exception, e:
+    if logger:
+      logger.error(sys.exc_info())
+    else:
+      print sys.exc_info()
+      print str(e)
+
+  finally:
+    if is_clear_pid:
+      if pidfile:
+        if os.path.isfile(pidfile):
+          os.unlink(pidfile)
 
