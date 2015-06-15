@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __author__  = "bw"
-__version__ = "0.1"
+__version__ = "0.1.0"
 
 import sys
 import logging

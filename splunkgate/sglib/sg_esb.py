@@ -10,8 +10,8 @@ from datetime import datetime, date, time
 class esb_handler:
 
   """Интеграция с ESB"""
-  logger = None
-  config = {}
+  _logger = None
+  _config = {}
 
 
   def __init__(self, logger, config):
@@ -20,8 +20,8 @@ class esb_handler:
     В configFile передается dict, содежащий конфигурацию SplunkGate
     В logger передает объект-логгер
     """
-    self.logger = logger
-    self.config = config
+    self._logger = logger
+    self._config = config
 
 
   def __create_ticket_message(self, parameters):
@@ -29,7 +29,7 @@ class esb_handler:
     <Systemcode>%s</Systemcode>
     <Task>%s</Task>
     <Comment>%s</Comment>
-    <Priority>%s</Priority></Systems>""" % (self.config['systemCode'], parameters['alert'], parameters['comment'], self.config['priority'])
+    <Priority>%s</Priority></Systems>""" % (self._config['systemCode'], parameters['alert'], parameters['comment'], self._config['priority'])
 
 
   def __create_get_ticket_status_message(self, parameters):
@@ -73,11 +73,11 @@ class esb_handler:
         </typ:SendMessage>
       </soapenv:Body>
     </soapenv:Envelope>""" % (parameters['messageId'],
-      self.config['serviceId'],
+      self._config['serviceId'],
       str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%s%z")),
-      self.config['routeId'],
-      self.config['login'],
-      self.config['password'],
+      self._config['routeId'],
+      self._config['login'],
+      self._config['password'],
       message)
 
     param = param.replace('\n', '')
@@ -92,12 +92,12 @@ class esb_handler:
     data = None
 
     headers = {"Content-type": "text/xml; charset=utf-8", "SOAPAction": ""}
-    log = ''.join(['Call ESB: host=http://', self.config['host'], self.config['url'], ';http headers=', str(headers), ';message=', message])
-    self.logger.info(log)
+    log = ''.join(['Call ESB: host=http://', self._config['host'], self._config['url'], ';http headers=', str(headers), ';message=', message])
+    self._logger.info(log)
 
     try:
-      conn = httplib.HTTPConnection(self.config["host"], timeout=self.config['timeout'])
-      conn.request("POST", self.config["url"], message, headers)
+      conn = httplib.HTTPConnection(self._config["host"], timeout=self._config['timeout'])
+      conn.request("POST", self._config["url"], message, headers)
       response = conn.getresponse()
       status = response.status
       reason = response.reason
@@ -105,19 +105,19 @@ class esb_handler:
 
       if status == 200:
         log = ''.join(['Success call ESB: status=', str(status), ';reason=', str(reason), ';data=', data])
-        self.logger.info(log)
+        self._logger.info(log)
       else:
         log = ''.join(['status=', str(status), ';reason=', str(reason), ';data=', data])
-        self.logger.error(log)
+        self._logger.error(log)
         raise Exception(log)
 
 
     except httplib.HTTPException, e:
-      self.logger.error('Unsuccess call ESB: '+ str(e))
+      self._logger.error('Unsuccess call ESB: '+ str(e))
       raise
 
     except Exception, e:
-      self.logger.error('Unsuccess call ESB: '+ str(e))
+      self._logger.error('Unsuccess call ESB: '+ str(e))
       raise
 
     finally:
@@ -132,6 +132,9 @@ class esb_handler:
       message = self.__create_soap_message(parameters, 1)
       response = self.__send_soap_message(message)
       resp = self.__parse_esb_response(response)
+      self._logger.info('Get ticket status: %s', resp)
+      if 'id' in resp:
+        self._logger.info('Create ticket with id=%s', resp.get('id'))
       return resp
     except Exception, e:
       raise
@@ -142,6 +145,9 @@ class esb_handler:
       message = self.__create_soap_message(parameters, 2)
       response = self.__send_soap_message(message)
       resp = self.__parse_esb_response(response)
+      self._logger.info('Get ticket status: %s', resp)
+      if 'id' in resp:
+        self._logger.info('Ticket with id=%s have status: %s', resp.get('id'), resp.get('fields').get('status').get('id'))
       return resp
     except Exception, e:
       raise
