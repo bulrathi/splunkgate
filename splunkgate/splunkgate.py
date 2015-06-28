@@ -75,11 +75,11 @@ def _create_ticket(esb, db, ticket):
 
   # попробовать создать тикет в JIRA
   resp = esb.create_ticket(ticket)
-  
+
   if 'message' in resp:
     # вернулось сообщение, которое не удалось распарсить
     logger.error('Get unparsible message: %s', resp)
-          
+
   else:
     # тикет создан в JIRA
     ticket['jiraId'] = resp['id']
@@ -98,52 +98,57 @@ def _parse_alert(config, logger, splunk_alerts, esb, db, alert, alert_type):
     if alert_type == _AlertType.WIN:
       # алерт от Windows-серверов
       ticket = splunk_alerts.parse_win_alert(alert)
-    else: 
+    else:
       # алерт от UNIX-серверов
       ticket = splunk_alerts.parse_unix_alert(alert)
-    
+
     ticket['messageId'] = str(uuid.uuid1())
+
+    # найти тикет в БД гейта
+    ticket1 = None
+    ticket1 = db.get_ticket(ticket)
+
+    if ticket1:
+      # тикет найден в БД гейта
+
+      ticket['jiraId'] = ticket1['jiraId']
+      ticket['jiraKey'] = ticket1['jiraKey']
+
+      if ticket['computerName'] in config['splunk.servers']:
+        ticket['systemCode'] = config.get('spunk.servers').get(ticket['computerName'])
+      else:
+        raise Exception('%s not found in servers list', ticket['computerName'])
+
+      if ticket['jiraId']:
+        # в БД гейта у тикета уже есть ID тикета в JIRA
+        logger.info('Find ticket: %s, check state in JIRA', ticket)
+        # получить статус тикета в JIRA
+        resp = esb.get_ticket_status(ticket)
+        # получаем ID тикета в JIRA
+        ticket['jiraStatusId'] = resp['fields']['status']['id']
+        if ticket['jiraStatusId'] in config['closeStatus']:
+          # если тикет закрыт в JIRA, то создаем новые
+          _create_ticket(esb, db, ticket)
+
+        # обновисть статус тикета в БД гейта
+        db.update_ticket(ticket)
+
+      else:
+        # тикет есть в БД гейта, но не имеет ID JIRA, возможно, он не был создан в JIRA
+        logger.info('Find ticket: %s, but not create in JIRA, try for create ticket in JIRA', ticket)
+        # пробуем создать тикет в JIRA
+        _create_ticket(esb, db, ticket)
+
+    else:
+      # тикет не найден в БД гейта
+      logger.info('No find ticket: %s, create ticket in JIRA', ticket)
+      # создать тикет в БД гейта
+      db.set_ticket(ticket)
+      # попробовать создать тикет в JIRA
+      _create_ticket(esb, db, ticket)
 
   except Exception, e:
     logger.error(e)
-
-  # найти тикет в БД гейта
-  ticket1 = None
-  ticket1 = db.get_ticket(ticket)
-  
-  if ticket1:
-    # тикет найден в БД гейта
-
-    ticket['jiraId'] = ticket1['jiraId']
-    ticket['jiraKey'] = ticket1['jiraKey']
-
-    if ticket['jiraId']:
-      # в БД гейта у тикета уже есть ID тикета в JIRA
-      logger.info('Find ticket: %s, check state in JIRA', ticket)
-      # получить статус тикета в JIRA
-      resp = esb.get_ticket_status(ticket)
-      # получаем ID тикета в JIRA
-      ticket['jiraStatusId'] = resp['fields']['status']['id']
-      if ticket['jiraStatusId'] in config['closeStatus']:
-        # если тикет закрыт в JIRA, то создаем новые
-        _create_ticket(esb, db, ticket)
-
-      # обновисть статус тикета в БД гейта
-      db.update_ticket(ticket)
-
-    else:
-      # тикет есть в БД гейта, но не имеет ID JIRA, возможно, он не был создан в JIRA
-      logger.info('Find ticket: %s, but not create in JIRA, try for create ticket in JIRA', ticket)
-      # пробуем создать тикет в JIRA
-      _create_ticket(esb, db, ticket)
-
-  else:
-    # тикет не найден в БД гейта
-    logger.info('No find ticket: %s, create ticket in JIRA', ticket)
-    # создать тикет в БД гейта
-    db.set_ticket(ticket)
-    # попробовать создать тикет в JIRA
-    _create_ticket(esb, db, ticket)
 
 
 if __name__ == "__main__":
@@ -153,14 +158,14 @@ if __name__ == "__main__":
 
   try:
     opts = _get_config(sys.argv[1])
-    
+
     logger = opts['logger']
     logger.info('Start SplunkGate')
 
     # проверка, что не запущен еще один экземпляр гейта
     pid = str(os.getpid())
     pidfile = opts['splunkgate']['pid']
-    
+
     if os.path.isfile(pidfile):
       # если найден PID-файл, завершить работу
       logger.warning("%s already exists, exiting", pidfile)
@@ -192,7 +197,7 @@ if __name__ == "__main__":
       _parse_alert(opts['jira'], logger, splunk_alerts, esb, db, alert, _AlertType.UNIX)
 
     logger.info('Stop SplunkGate')
-  
+
   except Exception, e:
     if logger:
       logger.error(sys.exc_info())

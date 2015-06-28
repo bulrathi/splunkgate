@@ -4,6 +4,70 @@
 		"selected_items":
 		[
 			[
+				"jira",
+				"jira_id"
+			],
+			[
+				"jira_",
+				"jira_key"
+			],
+			[
+				"loa",
+				"loads〔function〕"
+			],
+			[
+				"spl",
+				"splunk"
+			],
+			[
+				"data",
+				"database	(splunkgate.cfg)"
+			],
+			[
+				"opt",
+				"opts"
+			],
+			[
+				"ser",
+				"servers"
+			],
+			[
+				"work",
+				"workPath	(splunkgate.cfg)"
+			],
+			[
+				"passowrd",
+				"password"
+			],
+			[
+				"ti",
+				"ticket"
+			],
+			[
+				"tic",
+				"ticket1"
+			],
+			[
+				"sen",
+				"sendSOAPMessage"
+			],
+			[
+				"param",
+				"parameters"
+			],
+			[
+				"sys",
+				"systemCode"
+			],
+			[
+				"createTi",
+				"createTicketMessage"
+			],
+			[
+				"issu",
+				"issueId"
+			],
+			[
 				"fo",
 				"follower"
 			],
@@ -52,10 +116,59 @@
 	"buffers":
 	[
 		{
+			"file": "splunkgate.cfg",
+			"settings":
+			{
+				"buffer_size": 482,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "splunkgate.py",
 			"settings":
 			{
-				"buffer_size": 1643,
+				"buffer_size": 2577,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "{\n'comment': \n  'EventCode=1001\\nEventType=4\\nComputerName=Turniket.akimat.local\\nMessage=\\xd0\\x9a\\xd0\\xbe\\xd0\\xbd\\xd1\\x82\\xd0\\xb5\\xd0\\xb9\\xd0\\xbd\\xd0\\xb5\\xd1\\x80 \\xd0\\xbe\\xd1\\x88\\xd0\\xb8\\xd0\\xb1\\xd0\\xba\\xd0\\xb8 , \\xd1\\x82\\xd0\\xb8\\xd0\\xbf 0\\r\\n', \n'computerName': 'Turniket.akimat.local', \n'eventCode': '1001', \n'eventType': '4', \n'messageId': UUID('df57f0da-0ee4-11e5-8604-005056936e9a'), \n'message': '\\xd0\\x9a\\xd0\\xbe\\xd0\\xbd\\xd1\\x82\\xd0\\xb5\\xd0\\xb9\\xd0\\xbd\\xd0\\xb5\\xd1\\x80\\xd0\\xbe\\xd1\\x88\\xd0\\xb8\\xd0\\xb1\\xd0\\xba\\xd0\\xb8 , \\xd1\\x82\\xd0\\xb8\\xd0\\xbf 0\\r'\n}",
+			"settings":
+			{
+				"buffer_size": 557,
+				"line_ending": "Unix",
+				"name": "{"
+			}
+		},
+		{
+			"file": "sglib/sgalerts.py",
+			"settings":
+			{
+				"buffer_size": 3508,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sglib/sgconfig.py",
+			"settings":
+			{
+				"buffer_size": 2608,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sglib/sgdb.py",
+			"settings":
+			{
+				"buffer_size": 2979,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "sglib/sgesb.py",
+			"settings":
+			{
+				"buffer_size": 3488,
 				"line_ending": "Unix"
 			}
 		}
@@ -67,10 +180,18 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 392.0,
-		"last_filter": "",
+		"height": 187.0,
+		"last_filter": "install",
 		"selected_items":
 		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"Package Control: Install Package"
+			],
 			[
 				"ins",
 				"Package Control: Install Package"
@@ -82,10 +203,6 @@
 			[
 				"remove",
 				"Package Control: Remove Package"
-			],
-			[
-				"install",
-				"Package Control: Install Package"
 			],
 			[
 				"insta",
@@ -113,10 +230,15 @@
 	},
 	"expanded_folders":
 	[
-		"/Users/bw/work/splunkgate/splunkgate"
+		"/Users/bw/work/splunkgate/splunkgate",
+		"/Users/bw/work/splunkgate/splunkgate/sglib"
 	],
 	"file_history":
 	[
+		"/Users/bw/work/splunkgate/splunkgate/sglib/sglogger.py",
+		"/Users/bw/work/splunkgate/splunkgate/sftp-config.json",
+		"/Users/bw/work/splunkgate/splunkgate/sftp.json",
+		"/Users/bw/work/splunkgate/splunkgate/splunkgate.py",
 		"/Users/bw/work/mts/mnpgate/docs/messages/MNP/MNP_Port_In.txt",
 		"/Users/bw/work/decisionTest/src/wsdl/bindings.xml",
 		"/Users/bw/work/oorraa/messaging_schema.sql",
@@ -296,28 +418,161 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "splunkgate.py",
+					"file": "splunkgate.cfg",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1643,
+						"buffer_size": 482,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								39,
+								39
 							]
 						],
 						"settings":
 						{
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "splunkgate.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2577,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2312,
+								2312
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 273.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 557,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								557,
+								557
+							]
+						],
+						"settings":
+						{
+							"auto_name": "{",
+							"default_dir": "/Users/bw/work/splunkgate/splunkgate",
+							"incomplete_sync": null,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "sglib/sgalerts.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3508,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3106,
+								3106
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 832.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "sglib/sgconfig.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2608,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								906,
+								906
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
@@ -326,7 +581,75 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "sglib/sgdb.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2979,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2345,
+								2345
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 487.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "sglib/sgesb.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3488,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3356,
+								3356
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"incomplete_sync": null,
+							"remote_loading": false,
+							"synced": false,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 847.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -375,9 +698,21 @@
 	{
 		"height": 100.0
 	},
+	"output.exec":
+	{
+		"height": 100.0
+	},
 	"output.find_results":
 	{
 		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 100.0
+	},
+	"output.sftp":
+	{
+		"height": 100.0
 	},
 	"pinned_build_system": "",
 	"project": "splunkgate.sublime-project",

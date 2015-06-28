@@ -10,7 +10,7 @@ from optparse import OptionParser
 from optparse import OptionGroup
 
 class configuration(object):
-  
+
   def __init__(self, fname):
     self.fname = fname
     self.config = ConfigParser.RawConfigParser()
@@ -41,8 +41,8 @@ class configuration(object):
     for server in servers:
       _s = server[1].split(',')
       _s = map(lambda it: it.strip(), _s)
-      _s = map(lambda it: it.replace("'", ''), _s)
-      server_list[server[0].lower()] = _s
+      #_s = map(lambda it: it.replace("'", ''), _s)
+      server_list[server[0].lower()] = _s[0]
     return server_list
 
 

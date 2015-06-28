@@ -5,9 +5,12 @@ __version__ = "0.1.0"
 
 import shutil
 import time
+import re
+import os
 import os.path
 import gzip
 import traceback
+import glob
 
 class alert_handler:
   """Класс загрузки из файла алертов, поступающих от Splunk"""
@@ -26,6 +29,15 @@ class alert_handler:
     self._config = config
 
 
+  def __purge_old_snapshot(self, dir):
+    self._logger.info('Try delete old snaphot file: %s', dir)
+    filelist = glob.glob(dir)
+    for filename in filelist:
+      os.remove(filename)
+
+    self._logger.info('Delete old snaphot file: %s files', len(filelist))
+
+
   def __create_snapshot(self, logName, logType):
     """
     Метод создания снапшотов логов от Splunk
@@ -35,8 +47,10 @@ class alert_handler:
     """
     try:
       if logType == 1:
+        self.__purge_old_snapshot(self._config['snapshotPath'] + '/win_*.log')
         file1 = self._config['snapshotPath'] + '/win_' + str(int(time.time())) + '.log'
       else:
+        self.__purge_old_snapshot(self._config['snapshotPath'] + '/unix_*.log')
         file1 = self._config['snapshotPath'] + '/unix_' + str(int(time.time())) + '.log'
 
       # Если к конфигурационном файле в [SplunkGate].CreateSnapshot стоит значение 'false', то снапшот не создается.
@@ -103,7 +117,7 @@ class alert_handler:
         if len(win) > 0:
           w.append(win[0])
           response['win'] = w
-        
+
         if len(unix) > 0:
           u.append(unix[0])
           response['unix'] = u
@@ -187,7 +201,7 @@ class alert_handler:
         ticket['eventType'] = _t[1]
         ticket['eventCode'] = _t[4]
         ticket['comment'] = ''.join(['EventCode=', ticket['eventCode'], ';EventType=', ticket['eventType'], ';ComputerName=', ticket['computerName'], ';Message=', ticket['message']])
-      
+
         return ticket
 
     except Exception, e:
