@@ -93,7 +93,6 @@ def _parse_alert(config, logger, splunk_alerts, esb, db, alert, alert_type):
   """
   Обработка алертов
   """
-
   try:
     if alert_type == _AlertType.WIN:
       # алерт от Windows-серверов
@@ -114,10 +113,10 @@ def _parse_alert(config, logger, splunk_alerts, esb, db, alert, alert_type):
       ticket['jiraId'] = ticket1['jiraId']
       ticket['jiraKey'] = ticket1['jiraKey']
 
-      if ticket['computerName'] in config['splunk.servers']:
-        ticket['systemCode'] = config.get('spunk.servers').get(ticket['computerName'])
+      if ticket['computerName'] in config['splunk']['servers']:
+        ticket['systemCode'] = config.get('splunk').get('servers').get(ticket['computerName'])
       else:
-        raise Exception('%s not found in servers list', ticket['computerName'])
+        raise Exception('%s not found in servers list' % ticket['computerName'])
 
       if ticket['jiraId']:
         # в БД гейта у тикета уже есть ID тикета в JIRA
@@ -126,7 +125,7 @@ def _parse_alert(config, logger, splunk_alerts, esb, db, alert, alert_type):
         resp = esb.get_ticket_status(ticket)
         # получаем ID тикета в JIRA
         ticket['jiraStatusId'] = resp['fields']['status']['id']
-        if ticket['jiraStatusId'] in config['closeStatus']:
+        if ticket['jiraStatusId'] in config.get('jira').get('closeStatus'):
           # если тикет закрыт в JIRA, то создаем новые
           _create_ticket(esb, db, ticket)
 
@@ -190,11 +189,11 @@ if __name__ == "__main__":
     # Начать обработку сообщений из Splunk
     # обработка алерты от Windows-серверов
     for alert in alerts['win']:
-      _parse_alert(opts['jira'], logger, splunk_alerts, esb, db, alert, _AlertType.WIN)
+      _parse_alert(opts, logger, splunk_alerts, esb, db, alert, _AlertType.WIN)
 
     # обработка алерты от UNIX-серверов
     for alert in alerts['unix']:
-      _parse_alert(opts['jira'], logger, splunk_alerts, esb, db, alert, _AlertType.UNIX)
+      _parse_alert(opts, logger, splunk_alerts, esb, db, alert, _AlertType.UNIX)
 
     logger.info('Stop SplunkGate')
 

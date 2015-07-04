@@ -156,7 +156,7 @@ class alert_handler:
             ticket['message'] = _t.split('=')[1]
 
           if 'ComputerName' in _t:
-            ticket['computerName'] = _t.split('=')[1].lower()
+            ticket['computerName'] = _t.split('=')[1].lower().replace('\n', '')
 
         # Сформировать тело сообщения в Jira
         comment = ''.join(['EventCode=', ticket['eventCode'], ';EventType=', ticket['eventType'], ';ComputerName=', ticket['computerName'], ';Message=', ticket['computerName']])
@@ -173,6 +173,7 @@ class alert_handler:
     except Exception, e:
       traceback.print_stack()
       self._logger.error('Unsuccess parse Windows alert from Splunk log: ' + str(e))
+      print sys.exc_info()
       raise Exception(e)
 
     finally:
