@@ -8,6 +8,7 @@ import os
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+from time import gmtime, strftime
 
 import uuid
 
@@ -35,6 +36,7 @@ def _get_config(fname):
   config = configuration(fname)
   opts = dict(
     logger = config.get_logger('logger', __name__),
+    log_ticket_status = config.get_option_str('logger_ticket_status', 'logname'),
     esb = dict(
       host = config.get_option_str('esb','host'),
       url = config.get_option_str('esb','url'),
@@ -161,6 +163,8 @@ if __name__ == "__main__":
     logger = opts['logger']
     logger.info('Start SplunkGate')
 
+    log_ticket_status = opts['log_ticket_status']
+
     # проверка, что не запущен еще один экземпляр гейта
     pid = str(os.getpid())
     pidfile = opts['splunkgate']['pid']
@@ -182,6 +186,16 @@ if __name__ == "__main__":
 
     # Инициировать систему получения сообщений от Splunk
     splunk_alerts = alert_handler(logger, opts['splunk'])
+
+    ticket_status = db.get_ticket_status()
+    if len(ticket_status) > 0:
+      t = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+      f = open(log_ticket_status, 'a')
+      for status in ticket_status:
+        s = t + ';' + ''.join(['%s;' % (str(value)) for (key, value) in status.items()])
+        s = s[:-1]
+        f.write(s + '\n')
+      f.close()
 
     # Получить сообщения из Splunk
     alerts = splunk_alerts.get_alert()

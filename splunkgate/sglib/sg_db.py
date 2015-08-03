@@ -11,6 +11,7 @@ class db_layer:
   """
 
   _logger = None
+  _logger_ticket = None
   _config = {}
   _conn = None
 
@@ -106,3 +107,28 @@ class db_layer:
       cur = self._conn.cursor()
       cur.execute('UPDATE tickets SET send_to_esb_date = CURRENT_TIMESTAMP, jira_key = :jiraKey, jira_id = :jiraId, jira_status_id = :jiraStatusId WHERE event_code = :eventCode AND event_type =:eventType AND computer_name = :computerName', (ticket))
       self._conn.commit()
+
+
+  def get_ticket_status(self):
+    ticket_status = []
+
+    with self._conn:
+      cur = self._conn.cursor()
+
+      for row in cur.execute('SELECT event_code, event_type, computer_name, message, message_id, jira_id, jira_key, jira_status_id FROM tickets'):
+        ticket = {}
+#        ticket['eventCode'] = row[0]
+#        ticket['eventType'] = row[1]
+#        ticket['computerName'] = row[2]
+#        ticket['message'] = row[3]
+#        ticket['messageId'] = row[4]
+        if row[5]:
+          ticket['jiraId'] = row[5]
+          ticket['jiraKey'] = row[6]
+          ticket['jiraStatusId'] = row[7]
+          ticket_status.append(ticket)
+      cur.close()
+
+      return ticket_status
+
+
